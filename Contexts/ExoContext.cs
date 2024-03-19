@@ -1,0 +1,46 @@
+using Exo.WebApi.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
+
+namespace Exo.WebApi.Contexts
+{
+    public class ExoContext : DbContext
+    {
+        public ExoContext()
+        {
+        }
+        public ExoContext(DbContextOptions<ExoContext> options) : base(options)
+        {
+        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                // Substitua "12345" pela senha do seu SQL Server.
+                optionsBuilder.UseSqlServer("Server=localhost;Database=ExoApi;User Id=sa;Password=12345;Trusted_Connection=False;");
+            }
+        }
+        public DbSet<Projeto> Projetos { get; set; }
+
+        public bool TestarConexao(out string erro)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(Database.GetDbConnection().ConnectionString))
+                {
+                    connection.Open();
+                    erro = null;
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                erro = ex.Message;
+                return false;
+            }
+        }
+    }
+
+
+}
